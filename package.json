@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "pngjs": "^3.4.0",
+    "string-to-stream": "^1.1.1"
+  },
+  "name": "img-color",
+  "main": "./index.js"
+}
