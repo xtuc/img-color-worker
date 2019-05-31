@@ -36,7 +36,7 @@ async function handleRequest({ request }) {
               var reader = new FileReader();
 
               reader.addEventListener('load', function () {
-                fetch('https://that-test.site/img-color', {
+                fetch(location.href, {
                   method: "POST",
                   body: reader.result
                 })
