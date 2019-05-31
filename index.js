@@ -1,5 +1,6 @@
 import { PNG } from "pngjs/browser";
 import str from "string-to-stream";
+var jpeg = require("jpeg-js");
 
 function base64ToArrayBuffer(base64) {
   var binary_string = window.atob(base64);
@@ -26,7 +27,7 @@ async function handleRequest({ request }) {
           <title>Img color</title>
         </head>
         <body>
-          Upload a PNG:
+          Upload an image (JPEG or PNG):
           <input type="file" onchange="post()"/>
 
           <script>
@@ -58,36 +59,30 @@ async function handleRequest({ request }) {
     }
 
     if (request.method === "POST") {
-      const [, base64] = (await request.text()).split(",");
+      const [data, base64] = (await request.text()).split(",");
 
-      return await new Promise(ok => {
-        str(base64ToArrayBuffer(base64))
-          .pipe(
-            new PNG({
-              filterType: 4
-            })
-          )
-          .on("parsed", function() {
-            const size = this.width * this.height;
-            const rgb = [0, 0, 0];
-            for (var y = 0; y < this.height; y++) {
-              for (var x = 0; x < this.width; x++) {
-                var idx = (this.width * y + x) << 2;
-                rgb[0] += this.data[idx];
-                rgb[1] += this.data[idx + 1];
-                rgb[2] += this.data[idx + 2];
-              }
-            }
+      if (data === "data:image/jpeg;base64") {
+        var rawImageData = jpeg.decode(base64ToArrayBuffer(base64));
+        return new Response(
+          meanRgba(rawImageData.width, rawImageData.height, rawImageData.data)
+        );
+      }
 
-            const meanRgb = [
-              Math.floor(rgb[0] / size),
-              Math.floor(rgb[1] / size),
-              Math.floor(rgb[2] / size)
-            ];
+      if (data === "data:image/png;base64") {
+        return await new Promise(ok => {
+          str(base64ToArrayBuffer(base64))
+            .pipe(
+              new PNG({
+                filterType: 4
+              })
+            )
+            .on("parsed", function() {
+              ok(new Response(meanRgba(this.width, this.height, this.data)));
+            });
+        });
+      }
 
-            ok(new Response(meanRgb));
-          });
-      });
+      return new Response("unsupported: " + data, { status: 400 });
     }
 
     return new Response("not found", { status: 404 });
@@ -95,4 +90,23 @@ async function handleRequest({ request }) {
     console.log(err);
     return new Response(err.stack, { status: 500 });
   }
+}
+
+function meanRgba(w, h, matrix) {
+  const size = w * h;
+  const rgb = [0, 0, 0];
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      var idx = (w * y + x) << 2;
+      rgb[0] += matrix[idx];
+      rgb[1] += matrix[idx + 1];
+      rgb[2] += matrix[idx + 2];
+    }
+  }
+
+  return [
+    Math.floor(rgb[0] / size),
+    Math.floor(rgb[1] / size),
+    Math.floor(rgb[2] / size)
+  ];
 }
