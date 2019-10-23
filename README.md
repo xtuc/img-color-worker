@@ -2,8 +2,6 @@
 
 Retrieve the dominant color of a PNG or JPEG image.
 
-A template for kick starting a Cloudflare worker project.
-
 `index.js` is the content of the Workers script.
 
 #### Wrangler
