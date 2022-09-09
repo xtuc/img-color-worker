@@ -1,7 +1,5 @@
 name = "img-color"
-type = "webpack"
+main = "index.js"
+compatibility_date = "2022-09-09"
 
-account_id = ""
-workers_dev = true
-route = ""
-zone_id = ""
+node_compat = true

@@ -1,6 +1,6 @@
 import { PNG } from 'pngjs/browser'
 import str from 'string-to-stream'
-var jpeg = require('jpeg-js')
+import jpeg from 'jpeg-js'
 
 function base64ToArrayBuffer(base64) {
   var binary_string = atob(base64)
