@@ -9,5 +9,5 @@ Retrieve the dominant color of a PNG or JPEG image.
 To generate using [wrangler](https://github.com/cloudflare/wrangler)
 
 ```
-wrangler generate myApp https://github.com/xtuc/img-color-worker
+wrangler generate myapp https://github.com/xtuc/img-color-worker
 ```
